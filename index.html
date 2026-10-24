@@ -1,0 +1,765 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tong-Tong Bill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Layout: inputs stacked on the left, a sticky paper receipt on the right; single column on phones. */
+  :root {
+    --bg: #EEF2EF;
+    --card: #FFFFFF;
+    --ink: #14211B;
+    --muted: #586861;
+    --line: #D3DCD6;
+    --field: #F6F8F6;
+    --accent: #D63A2A;
+    --accent-ink: #FFFFFF;
+    --warn: #9A5B00;
+    --warn-bg: #FFF1D6;
+    --receipt: #FFFFFF;
+    --receipt-ink: #17201B;
+    --receipt-line: #C4CEC7;
+    --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1512; --card: #16201B; --ink: #E7EFEA; --muted: #98A9A1; --line: #27352E;
+      --field: #1B2722; --accent: #F26453; --accent-ink: #1A0704; --warn: #F0B64F; --warn-bg: #3A2D12;
+      --receipt: #1D2A24; --receipt-ink: #E9F0EC; --receipt-line: #38493F;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1512; --card: #16201B; --ink: #E7EFEA; --muted: #98A9A1; --line: #27352E;
+    --field: #1B2722; --accent: #F26453; --accent-ink: #1A0704; --warn: #F0B64F; --warn-bg: #3A2D12;
+    --receipt: #1D2A24; --receipt-ink: #E9F0EC; --receipt-line: #38493F;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.45;
+    padding-block: 28px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .page { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+  .top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+  .top-text { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-stretch: 118%;
+    font-weight: 800;
+    font-size: clamp(2rem, 6vw, 2.9rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .lede { margin: 0; color: var(--muted); max-width: 52ch; }
+  .hint { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (min-width: 880px) {
+    .grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 32px; }
+    .right { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); }
+  }
+  .left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .right { min-width: 0; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  h2 { margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+
+  .field, .plain {
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 9px 11px;
+    min-width: 0;
+    width: 100%;
+  }
+  .field::placeholder { color: var(--muted); opacity: 0.8; }
+  .num { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; }
+
+  .btn { border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 9px 14px; font-weight: 600; white-space: nowrap; }
+  .btn:hover { border-color: var(--muted); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.ghost { font-size: 13px; padding: 7px 12px; color: var(--muted); }
+  .icon { width: 34px; height: 34px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 18px; line-height: 1; }
+  .icon:hover { border-color: var(--line); color: var(--ink); }
+
+  .add { display: flex; gap: 8px; }
+  .add .field { flex: 1 1 auto; }
+
+  .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 4px 4px 5px; background: var(--field); max-width: 100%; }
+  .chip span.name { min-width: 0; overflow-wrap: anywhere; }
+  .chip .icon { width: 26px; height: 26px; font-size: 16px; border-radius: 999px; }
+  .av {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    display: inline-grid; place-items: center;
+    background: hsl(var(--h) 52% 40%); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+  }
+
+  .items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .item { display: flex; flex-direction: column; gap: 10px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .item:first-child { border-top: 0; padding-top: 0; }
+  .item-top { display: grid; grid-template-columns: minmax(0, 1fr) 7.5rem auto; gap: 8px; align-items: center; }
+  .price { display: flex; align-items: center; gap: 6px; background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 0 0 0 10px; min-width: 0; }
+  .price span { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .price input { border: 0; background: transparent; padding: 9px 10px 9px 0; width: 100%; min-width: 0; }
+  .price:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .price input:focus-visible { outline: none; }
+  .who { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .tog { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 500; }
+  .tog[aria-pressed="true"] { background: hsl(var(--h) 52% 40%); border-color: hsl(var(--h) 52% 40%); color: #fff; }
+  .tog.all { border-style: dashed; }
+  .each { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .each.none { color: var(--warn); }
+  .empty { margin: 0; color: var(--muted); font-size: 14px; }
+
+  .charge { display: grid; grid-template-columns: minmax(0, 1fr) 6rem; gap: 12px; align-items: center; }
+  .charge label.check { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .charge input[type="checkbox"], .check input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+  .rate { display: flex; align-items: center; gap: 6px; }
+  .rate span { color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
+  .note { margin: 0; font-size: 13px; color: var(--muted); }
+
+  /* Charge scope: which items get service charge / SST */
+  .charge-block { display: flex; flex-direction: column; gap: 10px; }
+  .charge-block + .charge-block { padding-top: 14px; border-top: 1px solid var(--line); }
+  .scope { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-left: 28px; }
+  .seg { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); }
+  .seg button { min-height: 36px; padding: 8px 14px; border: 0; border-radius: 6px; background: transparent; font-size: 13px; font-weight: 600; color: var(--muted); touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .seg button[aria-checked="true"] { background: var(--ink); color: var(--card); }
+  .pick-meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .pick-meta .link { border: 0; background: none; padding: 8px 6px; font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .taxes { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .taxes .lbl { font-size: 13px; color: var(--muted); margin-right: 2px; }
+  .tax { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; border: 1px dashed var(--line); border-radius: 6px; background: transparent; color: var(--muted); padding: 4px 11px; font-size: 13px; font-weight: 600; }
+  .tax::before { content: "+"; font-family: var(--font-mono); }
+  .tax[aria-pressed="true"] { border-style: solid; border-color: var(--ink); background: var(--ink); color: var(--card); }
+  .tax[aria-pressed="true"]::before { content: "✓"; }
+  @media (pointer: coarse) { .seg button, .tax { min-height: 44px; } .pick-meta .link { min-height: 44px; } }
+
+  /* Mode, delivery, mobile */
+  html { -webkit-text-size-adjust: 100%; }
+  .mode { display: flex; width: 100%; max-width: 380px; }
+  .mode button { flex: 1; font-size: 14px; }
+  .fee-list { display: flex; flex-direction: column; gap: 10px; }
+  .fee { display: grid; grid-template-columns: minmax(0, 1fr) 8rem; gap: 12px; align-items: center; }
+  .split { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .r-mode { flex-basis: 100%; font-size: 12px; color: var(--muted); }
+  .dock { display: none; }
+  .dock b { font-family: var(--font-mono); font-size: 18px; }
+  @media (max-width: 879px) {
+    body { padding-bottom: 88px; }
+    .dock { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; align-items: center; justify-content: space-between; gap: 12px; background: var(--card); border-top: 1px solid var(--line); padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+  }
+  @media (max-width: 480px) {
+    #itemForm { flex-wrap: wrap; }
+    #itemForm .field { flex: 1 1 100%; }
+    #itemForm .btn { flex: 1; }
+    .item-top { grid-template-columns: minmax(0, 1fr) 6.5rem auto; }
+    .charge { grid-template-columns: minmax(0, 1fr) 5.5rem; }
+    .fee { grid-template-columns: minmax(0, 1fr) 7rem; }
+  }
+  @media (pointer: coarse) { .field, .price input { font-size: 16px; } }
+
+  .card[hidden], .scope[hidden], .pick-meta[hidden], .dock[hidden], #errBar[hidden] { display: none !important; }
+
+  /* Receipt */
+  .receipt {
+    position: relative;
+    background: var(--receipt);
+    color: var(--receipt-ink);
+    border: 1px solid var(--receipt-line);
+    border-bottom: 0;
+    padding: 20px 18px 22px;
+    margin-bottom: 10px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .receipt::after {
+    content: "";
+    position: absolute; left: -1px; right: -1px; bottom: -9px; height: 9px;
+    background:
+      linear-gradient(135deg, var(--receipt) 25%, transparent 25%) -6px 0 / 12px 12px,
+      linear-gradient(225deg, var(--receipt) 25%, transparent 25%) -6px 0 / 12px 12px;
+  }
+  .r-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px dashed var(--receipt-line); }
+  .r-title { font-stretch: 118%; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
+  .r-date { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .r-people { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .r-people li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+  .r-who { min-width: 0; display: flex; flex-direction: column; }
+  .r-who b { font-weight: 600; overflow-wrap: anywhere; }
+  .r-who small { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .amt { font-family: var(--font-mono); font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .amt.zero { color: var(--muted); font-weight: 400; }
+  .r-totals { margin: 0; padding-top: 12px; border-top: 1px dashed var(--receipt-line); display: flex; flex-direction: column; gap: 6px; }
+  .r-totals div { display: flex; justify-content: space-between; gap: 12px; font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .r-totals dt, .r-totals dd { margin: 0; }
+  .r-totals dt { color: var(--muted); }
+  .r-totals .grand { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--receipt-ink); font-size: 16px; font-weight: 600; }
+  .r-totals .grand dt { color: var(--receipt-ink); }
+  .r-empty { margin: 0; color: var(--muted); }
+  .warn { margin: 0; background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+  .copy-wrap { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .copy-wrap textarea { width: 100%; min-height: 150px; font-family: var(--font-mono); font-size: 12px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<noscript><p style="margin:0;padding:12px 16px;background:#FFF1D6;color:#9A5B00;font:14px -apple-system,sans-serif">JavaScript is turned off here, so Tong-Tong Bill cannot work. Open the page link in Safari instead of a file preview.</p></noscript>
+<div class="page">
+  <header class="top">
+    <div class="top-text">
+      <h1>Tong-Tong Bill</h1>
+      <p class="lede">Tap who shared each dish. Choose dine-in or delivery and the extra charges, plus 5-sen rounding, are worked out for you.</p>
+      
+    </div>
+    <button type="button" class="btn ghost" id="fresh">Start fresh</button>
+  </header>
+
+  <div class="seg mode" role="radiogroup" aria-label="Bill type">
+    <button type="button" role="radio" id="modeDine" aria-checked="false">Dine-in</button>
+    <button type="button" role="radio" id="modeDv" aria-checked="false">Delivery</button>
+  </div>
+
+  <main class="grid">
+    <section class="left">
+      <div class="card">
+        <h2>Who is eating</h2>
+        <ul class="chips" id="people"></ul>
+        <div class="add" id="personForm">
+          <input class="field" id="personName" type="text" placeholder="Add a name" aria-label="Name of person to add" maxlength="30">
+          <button class="btn primary" type="button" id="addPersonBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>What was ordered</h2>
+        <ul class="items" id="items"></ul>
+        <div class="add" id="itemForm">
+          <input class="field" id="itemName" type="text" placeholder="Dish or drink" aria-label="Name of item to add" maxlength="60">
+          <div class="price" style="flex:0 0 7.5rem"><span>RM</span><input id="itemPrice" class="num" type="text" inputmode="decimal" placeholder="0.00" aria-label="Price of item to add"></div>
+          <button class="btn primary" type="button" id="addItemBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="card" id="cardCharges">
+        <h2>Extra charges</h2>
+        <div class="charge-block">
+          <div class="charge">
+            <label class="check" for="chkSc"><input type="checkbox" id="chkSc"> Service charge</label>
+            <div class="rate"><input class="field num" id="rateSc" type="text" inputmode="decimal" aria-label="Service charge percent"><span>%</span></div>
+          </div>
+          <div class="scope" id="scopeSc" hidden>
+            <div class="seg" role="radiogroup" aria-label="Service charge applies to">
+              <button type="button" role="radio" id="modeScAll" aria-checked="false">All items</button>
+              <button type="button" role="radio" id="modeScPick" aria-checked="false">Pick items</button>
+            </div>
+            <div class="pick-meta" id="metaSc" hidden>
+              <span id="countSc"></span>
+              <button type="button" class="link" data-bulk="sc:all">All</button>
+              <button type="button" class="link" data-bulk="sc:none">None</button>
+            </div>
+          </div>
+        </div>
+        <div class="charge-block">
+          <div class="charge">
+            <label class="check" for="chkSst"><input type="checkbox" id="chkSst"> SST</label>
+            <div class="rate"><input class="field num" id="rateSst" type="text" inputmode="decimal" aria-label="SST percent"><span>%</span></div>
+          </div>
+          <div class="scope" id="scopeSst" hidden>
+            <div class="seg" role="radiogroup" aria-label="SST applies to">
+              <button type="button" role="radio" id="modeSstAll" aria-checked="false">All items</button>
+              <button type="button" role="radio" id="modeSstPick" aria-checked="false">Pick items</button>
+            </div>
+            <div class="pick-meta" id="metaSst" hidden>
+              <span id="countSst"></span>
+              <button type="button" class="link" data-bulk="sst:all">All</button>
+              <button type="button" class="link" data-bulk="sst:none">None</button>
+            </div>
+          </div>
+        </div>
+        <label class="check" for="chkRound" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="chkRound"> Round each share to the nearest 5 sen</label>
+        <p class="note">SST is worked out on the price plus service charge, as most restaurants do. Rounded shares always add up to the final total.</p>
+      </div>
+    
+      <div class="card" id="cardDelivery" hidden>
+        <h2>Delivery fees</h2>
+        <div class="fee-list">
+      <label class="fee"><span>Delivery fee</span><div class="price"><span>RM</span><input class="num" type="text" inputmode="decimal" data-dv="delivery" placeholder="0.00"></div></label>
+      <label class="fee"><span>Platform fee</span><div class="price"><span>RM</span><input class="num" type="text" inputmode="decimal" data-dv="platform" placeholder="0.00"></div></label>
+      <label class="fee"><span>SST / tax</span><div class="price"><span>RM</span><input class="num" type="text" inputmode="decimal" data-dv="tax" placeholder="0.00"></div></label>
+      <label class="fee"><span>Driver tip</span><div class="price"><span>RM</span><input class="num" type="text" inputmode="decimal" data-dv="tip" placeholder="0.00"></div></label>
+      <label class="fee"><span>Discount or voucher</span><div class="price"><span>RM</span><input class="num" type="text" inputmode="decimal" data-dv="discount" placeholder="0.00"></div></label>
+        </div>
+        <div class="split">
+          <span class="note">Split fees</span>
+          <div class="seg" role="radiogroup" aria-label="How to split delivery fees">
+            <button type="button" role="radio" id="splitEqual" aria-checked="false">Equally</button>
+            <button type="button" role="radio" id="splitOrder" aria-checked="false">By order value</button>
+          </div>
+        </div>
+        <p class="note">Fees are shared only among people who ordered something. The discount is taken off the total. Rounded shares always add up to the final total.</p>
+      </div>
+    </section>
+
+    <aside class="right">
+      <div class="receipt" id="receipt">
+        <div class="r-head"><span class="r-title">Tong-Tong Bill</span><span class="r-date" id="rDate"></span><span class="r-mode" id="rMode"></span></div>
+        <div id="rBody"></div>
+      </div>
+      <div class="copy-wrap">
+        <button type="button" class="btn primary" id="copy">Copy for WhatsApp</button>
+        <textarea class="field" id="copyFallback" readonly hidden aria-label="Bill summary to copy"></textarea>
+      </div>
+    </aside>
+  </main>
+  <div class="dock" id="dock" hidden><span>Total <b id="dockTotal"></b></span><button type="button" class="btn primary" id="dockBtn">See bill</button></div>
+</div>
+
+<div id="errBar" hidden style="position:fixed;left:0;right:0;top:0;z-index:99;background:#9A1B10;color:#fff;padding:10px 16px;font:13px/1.4 -apple-system,sans-serif"></div>
+<script>
+window.addEventListener('error', function (e) {
+  var b = document.getElementById('errBar');
+  if (b) { b.hidden = false; b.textContent = 'Error: ' + (e.message || 'unknown') + (e.lineno ? ' (line ' + e.lineno + ')' : ''); }
+});
+</script>
+<script>
+(function () {
+  var KEY = 'tongtong-bill-v1';
+  var HUES = [8, 152, 205, 38, 285, 330, 95, 180];
+  var uid = 0;
+  function nid() { uid += 1; return uid; }
+  function mkPerson(name) { var id = nid(); return { id: id, name: name, h: HUES[id % HUES.length] }; }
+
+  function blankState() {
+    return { people: [], items: [], sc: { on: true, rate: '10', mode: 'all' }, sst: { on: true, rate: '6', mode: 'all' }, round: true, mode: 'dine',
+      dv: { delivery: '', platform: '', tax: '', tip: '', discount: '', split: 'equal' } };
+  }
+
+  var state = null;
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var o = JSON.parse(raw);
+      if (o && Array.isArray(o.people) && Array.isArray(o.items) && o.sc && o.sst) { state = o; }
+    }
+  } catch (e) { state = null; }
+  if (!state) { state = blankState(); }
+  if (state.mode !== 'delivery') { state.mode = 'dine'; }
+  if (!state.dv) { state.dv = blankState().dv; }
+  state.people.forEach(function (p) { uid = Math.max(uid, p.id); });
+  state.items.forEach(function (i) { uid = Math.max(uid, i.id); });
+
+  var lastText = '';
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function num(p) { var v = parseFloat(String(p).replace(',', '.')); return isFinite(v) && v > 0 ? v : 0; }
+  function money(n) { return n.toFixed(2); }
+  function rm(n) { return 'RM ' + money(n); }
+  function rateText(r) { return String(+num(r).toFixed(2)); }
+  function scopeText(ch, n) { return ch.mode === 'pick' ? ' on ' + n + (n === 1 ? ' item' : ' items') : ''; }
+  function applies(it, k) { var c = state[k]; return state.mode !== 'delivery' && !!c.on && (c.mode !== 'pick' || it[k] !== false); }
+  function initials(name) {
+    var w = name.trim().split(/\s+/);
+    return ((w[0] ? w[0][0] : '?') + (w[1] ? w[1][0] : '')).toUpperCase();
+  }
+  function save() {
+    state.sample = false;
+    
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function validWho(it) {
+    var ids = {}; state.people.forEach(function (p) { ids[p.id] = true; });
+    return it.who.filter(function (id) { return ids[id]; });
+  }
+
+  function calc() {
+    var scR = state.sc.on ? num(state.sc.rate) / 100 : 0;
+    var ssR = state.sst.on ? num(state.sst.rate) / 100 : 0;
+    var byId = {};
+    state.people.forEach(function (p) { byId[p.id] = { sub: 0, sc: 0, sst: 0 }; });
+    var unCount = 0, unSum = 0, scN = 0, ssN = 0;
+    state.items.forEach(function (it) {
+      var who = validWho(it);
+      var price = num(it.p);
+      if (!who.length) { if (price > 0) { unCount += 1; unSum += price; } return; }
+      var onSc = applies(it, 'sc'), onSs = applies(it, 'sst');
+      if (price > 0) { if (onSc) { scN += 1; } if (onSs) { ssN += 1; } }
+      var share = price / who.length;
+      var shareSc = onSc ? share * scR : 0;
+      var shareSs = onSs ? (share + shareSc) * ssR : 0;
+      who.forEach(function (id) { byId[id].sub += share; byId[id].sc += shareSc; byId[id].sst += shareSs; });
+    });
+    var rows = state.people.map(function (p) {
+      var b = byId[p.id];
+      return { p: p, sub: b.sub, sc: b.sc, sst: b.sst, exact: b.sub + b.sc + b.sst };
+    });
+    var isDv = state.mode === 'delivery', dv = state.dv;
+    var fees = { delivery: num(dv.delivery), platform: num(dv.platform), tax: num(dv.tax), tip: num(dv.tip), discount: num(dv.discount) };
+    var feeNet = isDv ? fees.delivery + fees.platform + fees.tax + fees.tip - fees.discount : 0;
+    var byOrder = dv.split === 'order';
+    var wsum = rows.reduce(function (a, r) { return a + (r.sub > 0 ? (byOrder ? r.sub : 1) : 0); }, 0);
+    rows.forEach(function (r) {
+      r.fee = isDv && r.sub > 0 && wsum > 0 ? feeNet * (byOrder ? r.sub : 1) / wsum : 0;
+      r.exact += r.fee;
+    });
+    function sum(k) { return rows.reduce(function (a, r) { return a + r[k]; }, 0); }
+    var exactTotal = sum('exact');
+    var unit = state.round ? 5 : 1;
+    var target = Math.round((exactTotal * 100) / unit) * unit;
+    var alloc = rows.map(function (r) {
+      var c = r.exact * 100;
+      var f = Math.floor(c / unit + 1e-9) * unit;
+      return { f: f, rem: c - f };
+    });
+    var left = Math.round((target - alloc.reduce(function (a, x) { return a + x.f; }, 0)) / unit);
+    var order = alloc.slice().sort(function (a, b) { return b.rem - a.rem; });
+    var k = 0;
+    while (left > 0 && order.length) { order[k % order.length].f += unit; left -= 1; k += 1; }
+    rows.forEach(function (r, i) { r.final = alloc[i].f / 100; });
+    return {
+      rows: rows, subtotal: sum('sub'), sc: sum('sc'), sst: sum('sst'),
+      exactTotal: exactTotal, total: target / 100, rounding: target / 100 - exactTotal,
+      unCount: unCount, unSum: unSum, scN: scN, ssN: ssN, fees: fees, feeNet: feeNet, isDv: isDv
+    };
+  }
+
+  function buildText(c) {
+    var lines = ['Tong-Tong Bill, ' + $('rDate').textContent + ', ' + (c.isDv ? 'delivery' : 'dine-in'), ''];
+    c.rows.forEach(function (r) { if (r.exact > 0) { lines.push(r.p.name + ': ' + rm(r.final)); } });
+    lines.push('');
+    var extras = [];
+    if (!c.isDv && state.sc.on && num(state.sc.rate) > 0) { extras.push(rateText(state.sc.rate) + '% service charge' + (state.sc.mode === 'pick' ? ' on selected items' : '')); }
+    if (!c.isDv && state.sst.on && num(state.sst.rate) > 0) { extras.push(rateText(state.sst.rate) + '% SST' + (state.sst.mode === 'pick' ? ' on selected items' : '')); }
+    var less = c.isDv && c.fees.discount > 0;
+    if (c.isDv) { [['delivery', 'delivery fee'], ['platform', 'platform fee'], ['tax', 'SST'], ['tip', 'tip']].forEach(function (f) { if (c.fees[f[0]] > 0) { extras.push(f[1]); } }); }
+    lines.push('Total ' + rm(c.total) + (extras.length ? ' (includes ' + extras.join(' + ') + (less ? ', less discount' : '') + ')' : (less ? ' (less discount)' : '')));
+    return lines.join('\n');
+  }
+
+  function renderSummary() {
+    var c = calc();
+    var hasAny = c.rows.some(function (r) { return r.exact > 0; });
+    var h = '';
+    if (!state.people.length) {
+      h = '<p class="r-empty">Add the people at the table to see who owes what.</p>';
+    } else if (!hasAny) {
+      h = '<p class="r-empty">Add an item and tap who shared it.</p>';
+    } else {
+      h += '<ul class="r-people">';
+      c.rows.forEach(function (r) {
+        var parts = ['Items ' + money(r.sub)];
+        if (state.sc.on && r.sc > 0) { parts.push('Service ' + money(r.sc)); }
+        if (state.sst.on && r.sst > 0) { parts.push('SST ' + money(r.sst)); }
+        if (c.isDv && Math.abs(r.fee) >= 0.005) { parts.push('Fees ' + (r.fee < 0 ? '−' : '') + money(Math.abs(r.fee))); }
+        h += '<li><span class="av" style="--h:' + r.p.h + '">' + esc(initials(r.p.name)) + '</span>' +
+          '<div class="r-who"><b>' + esc(r.p.name) + '</b><small>' + parts.join(' · ') + '</small></div>' +
+          '<span class="amt' + (r.exact > 0 ? '' : ' zero') + '">' + rm(r.final) + '</span></li>';
+      });
+      h += '</ul><dl class="r-totals">';
+      h += '<div><dt>Subtotal</dt><dd>' + rm(c.subtotal) + '</dd></div>';
+      if (state.sc.on && c.sc > 0) { h += '<div><dt>Service charge ' + rateText(state.sc.rate) + '%' + scopeText(state.sc, c.scN) + '</dt><dd>' + rm(c.sc) + '</dd></div>'; }
+      if (state.sst.on && c.sst > 0) { h += '<div><dt>SST ' + rateText(state.sst.rate) + '%' + scopeText(state.sst, c.ssN) + '</dt><dd>' + rm(c.sst) + '</dd></div>'; }
+      if (c.isDv) {
+        [['delivery', 'Delivery fee', 1], ['platform', 'Platform fee', 1], ['tax', 'SST / tax', 1], ['tip', 'Driver tip', 1], ['discount', 'Discount', -1]].forEach(function (f) {
+          var v = c.fees[f[0]];
+          if (v > 0) { h += '<div><dt>' + f[1] + '</dt><dd>' + (f[2] < 0 ? '−' : '') + rm(v) + '</dd></div>'; }
+        });
+      }
+      if (state.round && Math.abs(c.rounding) >= 0.005) {
+        h += '<div><dt>Rounding</dt><dd>' + (c.rounding >= 0 ? '+' : '−') + money(Math.abs(c.rounding)) + '</dd></div>';
+      }
+      h += '<div class="grand"><dt>Total</dt><dd>' + rm(c.total) + '</dd></div></dl>';
+    }
+    if (c.unCount) {
+      h += '<p class="warn" role="status">' + c.unCount + (c.unCount === 1 ? ' item has' : ' items have') +
+        ' nobody assigned (' + rm(c.unSum) + '). It is left out of the total.</p>';
+    }
+    $('rBody').innerHTML = h;
+    lastText = hasAny ? buildText(c) : '';
+    $('copy').disabled = !hasAny;
+    renderScope();
+    $('rMode').textContent = c.isDv ? 'Delivery' : 'Dine-in';
+    syncDock(c.total, hasAny);
+    updateEach();
+  }
+
+  function updateEach() {
+    var lis = $('items').querySelectorAll('.item');
+    Array.prototype.forEach.call(lis, function (li) {
+      var it = state.items.filter(function (x) { return String(x.id) === li.getAttribute('data-id'); })[0];
+      var el = li.querySelector('[data-each]');
+      if (!it || !el) { return; }
+      var n = validWho(it).length;
+      el.classList.toggle('none', n === 0);
+      el.textContent = n === 0 ? 'Tap a name to assign' : (n > 1 ? rm(num(it.p) / n) + ' each' : '');
+    });
+  }
+
+  function renderPeople() {
+    var h = '';
+    state.people.forEach(function (p) {
+      h += '<li class="chip"><span class="av" style="--h:' + p.h + '">' + esc(initials(p.name)) + '</span>' +
+        '<span class="name">' + esc(p.name) + '</span>' +
+        '<button type="button" class="icon" data-rm-person="' + p.id + '" aria-label="Remove ' + esc(p.name) + '">×</button></li>';
+    });
+    $('people').innerHTML = h || '<li class="empty">Nobody yet. Add the first name below.</li>';
+  }
+
+  function renderItems() {
+    var dine = state.mode !== 'delivery', pickSc = dine && !!state.sc.on && state.sc.mode === 'pick', pickSs = dine && !!state.sst.on && state.sst.mode === 'pick';
+    var h = '';
+    state.items.forEach(function (it) {
+      var who = validWho(it);
+      h += '<li class="item" data-id="' + it.id + '"><div class="item-top">' +
+        '<input class="field" type="text" data-f="name" value="' + esc(it.name) + '" aria-label="Item name" maxlength="60">' +
+        '<div class="price"><span>RM</span><input class="num" type="text" inputmode="decimal" data-f="price" value="' + esc(it.p) + '" aria-label="Price of ' + esc(it.name) + '"></div>' +
+        '<button type="button" class="icon" data-del-item aria-label="Remove ' + esc(it.name) + '">×</button></div>' +
+        '<div class="who" role="group" aria-label="Shared by">';
+      state.people.forEach(function (p) {
+        h += '<button type="button" class="tog" style="--h:' + p.h + '" data-who="' + p.id + '" aria-pressed="' + (who.indexOf(p.id) !== -1) + '">' + esc(p.name) + '</button>';
+      });
+      if (state.people.length > 1) { h += '<button type="button" class="tog all" data-all>Everyone</button>'; }
+      h += '<span class="each" data-each></span></div>';
+      if (pickSc || pickSs) {
+        h += '<div class="taxes" role="group" aria-label="Charges on this item"><span class="lbl">Add to this item</span>';
+        if (pickSc) { h += '<button type="button" class="tax" data-tax="sc" aria-pressed="' + (it.sc !== false) + '">Service charge</button>'; }
+        if (pickSs) { h += '<button type="button" class="tax" data-tax="sst" aria-pressed="' + (it.sst !== false) + '">SST</button>'; }
+        h += '</div>';
+      }
+      h += '</li>';
+    });
+    $('items').innerHTML = h || '<li class="empty">No items yet. Add the first dish below.</li>';
+  }
+
+  function renderCharges() {
+    $('chkSc').checked = !!state.sc.on;
+    $('rateSc').value = state.sc.rate;
+    $('chkSst').checked = !!state.sst.on;
+    $('rateSst').value = state.sst.rate;
+    $('chkRound').checked = !!state.round;
+  }
+
+  function renderScope() {
+    [['sc', 'Sc'], ['sst', 'Sst']].forEach(function (k) {
+      var c = state[k[0]], S = k[1], pick = c.mode === 'pick';
+      $('scope' + S).hidden = !c.on;
+      $('mode' + S + 'All').setAttribute('aria-checked', String(!pick)); $('mode' + S + 'Pick').setAttribute('aria-checked', String(pick));
+      $('meta' + S).hidden = !pick;
+      var n = state.items.filter(function (it) { return it[k[0]] !== false; }).length;
+      $('count' + S).textContent = n + ' of ' + state.items.length + (state.items.length === 1 ? ' item' : ' items');
+    });
+  }
+
+  function keepFocus(fn) {
+    var a = document.activeElement, id = null, sel = null;
+    if (a && a.closest && a.closest('.item')) {
+      id = a.closest('.item').getAttribute('data-id');
+      if (a.hasAttribute('data-who')) { sel = '[data-who="' + a.getAttribute('data-who') + '"]'; }
+      else if (a.hasAttribute('data-tax')) { sel = '[data-tax="' + a.getAttribute('data-tax') + '"]'; }
+      else if (a.hasAttribute('data-all')) { sel = '[data-all]'; }
+    }
+    fn();
+    if (id && sel) {
+      var li = $('items').querySelector('.item[data-id="' + id + '"]');
+      var btn = li && li.querySelector(sel);
+      if (btn) { btn.focus(); }
+    }
+  }
+
+  function renderMode() {
+    var dv = state.mode === 'delivery';
+    $('modeDv').setAttribute('aria-checked', String(dv)); $('modeDine').setAttribute('aria-checked', String(!dv));
+    $('cardCharges').hidden = dv; $('cardDelivery').hidden = !dv;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dv]'), function (el) { el.value = state.dv[el.getAttribute('data-dv')] || ''; });
+    var so = state.dv.split === 'order';
+    $('splitOrder').setAttribute('aria-checked', String(so)); $('splitEqual').setAttribute('aria-checked', String(!so));
+  }
+
+  function renderAll() {
+    
+    renderMode(); renderPeople(); renderItems(); renderCharges(); renderSummary();
+  }
+
+  function findItem(el) {
+    var li = el.closest('.item');
+    if (!li) { return null; }
+    return state.items.filter(function (x) { return String(x.id) === li.getAttribute('data-id'); })[0] || null;
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button');
+    if (!t) { return; }
+    var item, i;
+    if (t.hasAttribute('data-rm-person')) {
+      var pid = parseInt(t.getAttribute('data-rm-person'), 10);
+      state.people = state.people.filter(function (p) { return p.id !== pid; });
+      state.items.forEach(function (it) { it.who = it.who.filter(function (id) { return id !== pid; }); });
+      save(); renderPeople(); renderItems(); renderSummary();
+    } else if (t.hasAttribute('data-del-item')) {
+      item = findItem(t);
+      if (item) { state.items = state.items.filter(function (x) { return x !== item; }); save(); renderItems(); renderSummary(); }
+    } else if (t.hasAttribute('data-who')) {
+      item = findItem(t);
+      var wid = parseInt(t.getAttribute('data-who'), 10);
+      if (item) {
+        i = item.who.indexOf(wid);
+        if (i === -1) { item.who.push(wid); } else { item.who.splice(i, 1); }
+        save(); keepFocus(renderItems); renderSummary();
+      }
+    } else if (t.hasAttribute('data-all')) {
+      item = findItem(t);
+      if (item) { item.who = state.people.map(function (p) { return p.id; }); save(); keepFocus(renderItems); renderSummary(); }
+    } else if (t.hasAttribute('data-tax')) {
+      item = findItem(t);
+      var tk = t.getAttribute('data-tax');
+      if (item) { item[tk] = item[tk] === false; save(); keepFocus(renderItems); renderSummary(); }
+    } else if (t.hasAttribute('data-bulk')) {
+      var bp = t.getAttribute('data-bulk').split(':');
+      state.items.forEach(function (x) { x[bp[0]] = bp[1] === 'all'; });
+      save(); renderItems(); renderSummary();
+    }
+  });
+
+  ['Sc', 'Sst'].forEach(function (S) {
+    var key = S.toLowerCase();
+    ['All', 'Pick'].forEach(function (m) {
+      $('mode' + S + m).addEventListener('click', function () {
+        state[key].mode = m.toLowerCase();
+        save(); renderItems(); renderSummary();
+      });
+    });
+  });
+
+  $('items').addEventListener('input', function (e) {
+    var f = e.target.getAttribute('data-f');
+    var item = findItem(e.target);
+    if (!f || !item) { return; }
+    if (f === 'name') { item.name = e.target.value; } else { item.p = e.target.value; }
+    save(); renderSummary();
+  });
+
+  $('personForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('personName').value.trim();
+    if (!v) { return; }
+    state.people.push(mkPerson(v));
+    $('personName').value = '';
+    save(); renderPeople(); renderItems(); renderSummary();
+    $('personName').focus();
+  });
+
+  $('itemForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('itemName').value.trim();
+    var price = $('itemPrice').value.trim();
+    if (!name && !num(price)) { return; }
+    state.items.push({ id: nid(), name: name || 'Item', p: price, who: [], sc: false, sst: false });
+    $('itemName').value = ''; $('itemPrice').value = '';
+    save(); renderItems(); renderSummary();
+    $('itemName').focus();
+  });
+
+  $('chkSc').addEventListener('change', function (e) { state.sc.on = e.target.checked; save(); renderItems(); renderSummary(); });
+  $('rateSc').addEventListener('input', function (e) { state.sc.rate = e.target.value; save(); renderSummary(); });
+  $('chkSst').addEventListener('change', function (e) { state.sst.on = e.target.checked; save(); renderItems(); renderSummary(); });
+  $('rateSst').addEventListener('input', function (e) { state.sst.rate = e.target.value; save(); renderSummary(); });
+  $('chkRound').addEventListener('change', function (e) { state.round = e.target.checked; save(); renderSummary(); });
+
+  ['modeDine', 'modeDv'].forEach(function (id) {
+    $(id).addEventListener('click', function () {
+      state.mode = id === 'modeDv' ? 'delivery' : 'dine'; save(); renderMode(); renderItems(); renderSummary();
+    });
+  });
+  ['splitEqual', 'splitOrder'].forEach(function (id) {
+    $(id).addEventListener('click', function () { state.dv.split = id === 'splitOrder' ? 'order' : 'equal'; save(); renderMode(); renderSummary(); });
+  });
+  $('cardDelivery').addEventListener('input', function (e) {
+    var k = e.target.getAttribute('data-dv');
+    if (!k) { return; }
+    state.dv[k] = e.target.value; save(); renderSummary();
+  });
+
+  function wire(boxId, btnId) {
+    var box = $(boxId);
+    function fire() { box.dispatchEvent(new Event('submit', { cancelable: true })); }
+    $(btnId).addEventListener('click', fire);
+    box.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.keyCode === 13) && e.target.tagName === 'INPUT') { e.preventDefault(); fire(); }
+    });
+  }
+  wire('personForm', 'addPersonBtn');
+  wire('itemForm', 'addItemBtn');
+
+  var freshTimer = null;
+  $('fresh').addEventListener('click', function () {
+    var b = $('fresh');
+    if (!freshTimer) {
+      b.textContent = 'Tap again to clear everything';
+      freshTimer = setTimeout(function () { b.textContent = 'Start fresh'; freshTimer = null; }, 3500);
+      return;
+    }
+    clearTimeout(freshTimer); freshTimer = null;
+    b.textContent = 'Start fresh';
+    state = blankState();
+    save(); renderAll();
+    $('copyFallback').hidden = true;
+    $('personName').focus();
+  });
+
+  var copyTimer = null;
+  $('copy').addEventListener('click', function () {
+    var btn = $('copy');
+    var text = lastText;
+    if (!text) { return; }
+    function reset() { btn.textContent = 'Copy for WhatsApp'; }
+    function ok() { btn.textContent = 'Copied'; clearTimeout(copyTimer); copyTimer = setTimeout(reset, 1600); }
+    function fallback() {
+      var ta = $('copyFallback');
+      ta.hidden = false; ta.value = text; ta.focus(); ta.select();
+      btn.textContent = 'Select the text below and copy';
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(ok, fallback); }
+      else { fallback(); }
+    } catch (err) { fallback(); }
+  });
+
+  var recVisible = false, dockOn = false;
+  function syncDock(total, any) {
+    dockOn = any;
+    $('dockTotal').textContent = rm(total);
+    $('dock').hidden = !(dockOn && !recVisible);
+  }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (en) { recVisible = en[0].isIntersecting; $('dock').hidden = !(dockOn && !recVisible); }).observe($('receipt'));
+  }
+  $('dockBtn').addEventListener('click', function () {
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $('receipt').scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  $('rDate').textContent = new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  renderAll();
+})();
+</script>
+
+</body></html>
